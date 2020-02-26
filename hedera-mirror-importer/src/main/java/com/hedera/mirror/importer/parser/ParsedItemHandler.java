@@ -33,9 +33,4 @@ public interface ParsedItemHandler {
      * @throws ImporterException
      */
     void onFileComplete() throws ImporterException;
-
-    /**
-     * Called if an error is encountered during processing of stream file.
-     */
-    void onError(Throwable e);
 }

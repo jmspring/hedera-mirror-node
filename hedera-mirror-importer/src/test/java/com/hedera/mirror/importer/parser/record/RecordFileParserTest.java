@@ -21,12 +21,14 @@ package com.hedera.mirror.importer.parser.record;
  */
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
 import com.google.common.collect.Sets;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import javax.annotation.Resource;
 import org.apache.commons.io.FileUtils;
 import org.assertj.core.api.Assertions;
@@ -39,9 +41,11 @@ import org.springframework.test.context.jdbc.Sql;
 import com.hedera.mirror.importer.FileCopier;
 import com.hedera.mirror.importer.IntegrationTest;
 import com.hedera.mirror.importer.domain.ApplicationStatusCode;
+import com.hedera.mirror.importer.domain.RecordFile;
 import com.hedera.mirror.importer.domain.StreamType;
 import com.hedera.mirror.importer.domain.Transaction;
 import com.hedera.mirror.importer.repository.ApplicationStatusRepository;
+import com.hedera.mirror.importer.repository.RecordFileRepository;
 import com.hedera.mirror.importer.repository.TransactionRepository;
 
 // Class manually commits so have to manually cleanup tables
@@ -60,9 +64,16 @@ public class RecordFileParserTest extends IntegrationTest {
     @Resource
     private TransactionRepository transactionRepository;
     @Resource
+    private RecordFileRepository recordFileRepository;
+    @Resource
     private RecordParserProperties parserProperties;
     private FileCopier fileCopier;
     private StreamType streamType;
+
+    private static File file1;
+    private static File file2;
+    private static final int NUM_TXNS_FILE_1 = 19;
+    private static final int NUM_TXNS_FILE_2 = 15;
 
     @BeforeEach
     void before() {
@@ -73,6 +84,8 @@ public class RecordFileParserTest extends IntegrationTest {
                 .from(streamType.getPath(), "v2", "record0.0.3")
                 .filterFiles("*.rcd")
                 .to(streamType.getPath(), streamType.getValid());
+        file1 = parserProperties.getValidPath().resolve("2019-08-30T18_10_00.419072Z.rcd").toFile();
+        file2 = parserProperties.getValidPath().resolve("2019-08-30T18_10_05.249678Z.rcd").toFile();
     }
 
     @Test
@@ -84,13 +97,15 @@ public class RecordFileParserTest extends IntegrationTest {
                 .filteredOn(p -> !p.toFile().isDirectory())
                 .hasSize(2)
                 .extracting(Path::getFileName)
-                .contains(Paths.get("2019-08-30T18_10_05.249678Z.rcd"))
-                .contains(Paths.get("2019-08-30T18_10_00.419072Z.rcd"));
+                .contains(Paths.get(file1.getName()))
+                .contains(Paths.get(file2.getName()));
 
         Assertions.assertThat(transactionRepository.findAll())
-                .hasSize(19 + 15)
+                .hasSize(NUM_TXNS_FILE_1 + NUM_TXNS_FILE_2)
                 .extracting(Transaction::getType)
                 .containsOnlyElementsOf(Sets.newHashSet(11, 12, 14));
+        assertEquals(1, recordFileRepository.findByName(file1.toString()).size());
+        assertEquals(1, recordFileRepository.findByName(file2.toString()).size());
     }
 
     @Test
@@ -100,6 +115,7 @@ public class RecordFileParserTest extends IntegrationTest {
         recordFileParser.parse();
         assertThat(Files.walk(parserProperties.getParsedPath())).filteredOn(p -> !p.toFile().isDirectory()).hasSize(0);
         assertThat(transactionRepository.count()).isEqualTo(0L);
+        assertEquals(0, recordFileRepository.count());
     }
 
     @Test
@@ -107,16 +123,16 @@ public class RecordFileParserTest extends IntegrationTest {
         recordFileParser.parse();
         assertThat(Files.walk(parserProperties.getParsedPath())).filteredOn(p -> !p.toFile().isDirectory()).hasSize(0);
         assertThat(transactionRepository.count()).isEqualTo(0L);
+        assertEquals(0, recordFileRepository.count());
     }
 
     @Test
     void invalidFile() throws Exception {
-        File recordFile = dataPath.resolve(streamType.getPath()).resolve(streamType.getValid())
-                .resolve("2019-08-30T18_10_05.249678Z.rcd").toFile();
-        FileUtils.writeStringToFile(recordFile, "corrupt", "UTF-8");
+        FileUtils.writeStringToFile(file2, "corrupt", "UTF-8");
         recordFileParser.parse();
         assertThat(Files.walk(parserProperties.getParsedPath())).filteredOn(p -> !p.toFile().isDirectory()).hasSize(0);
         assertThat(transactionRepository.count()).isEqualTo(0L);
+        assertEquals(0, recordFileRepository.count());
     }
 
     @Test
@@ -126,14 +142,14 @@ public class RecordFileParserTest extends IntegrationTest {
         recordFileParser.parse();
         assertThat(Files.walk(parserProperties.getParsedPath())).filteredOn(p -> !p.toFile().isDirectory()).hasSize(0);
         assertThat(transactionRepository.count()).isEqualTo(0L);
+        assertEquals(0, recordFileRepository.count());
     }
 
     @Test
     void bypassHashMismatch() throws Exception {
         applicationStatusRepository.updateStatusValue(ApplicationStatusCode.LAST_PROCESSED_RECORD_HASH, "123");
-        applicationStatusRepository
-                .updateStatusValue(ApplicationStatusCode.RECORD_HASH_MISMATCH_BYPASS_UNTIL_AFTER, "2019-09-01T00:00" +
-                        ":00.000000Z.rcd");
+        applicationStatusRepository.updateStatusValue(ApplicationStatusCode.RECORD_HASH_MISMATCH_BYPASS_UNTIL_AFTER,
+                "2019-09-01T00:00:00.000000Z.rcd");
         fileCopier.copy();
         recordFileParser.parse();
 
@@ -141,10 +157,10 @@ public class RecordFileParserTest extends IntegrationTest {
                 .filteredOn(p -> !p.toFile().isDirectory())
                 .hasSize(2)
                 .extracting(Path::getFileName)
-                .contains(Paths.get("2019-08-30T18_10_05.249678Z.rcd"))
-                .contains(Paths.get("2019-08-30T18_10_00.419072Z.rcd"));
+                .contains(Paths.get(file1.getName()))
+                .contains(Paths.get(file2.getName()));
 
-        Assertions.assertThat(transactionRepository.findAll()).hasSize(19 + 15);
+        Assertions.assertThat(transactionRepository.findAll()).hasSize(NUM_TXNS_FILE_1 + NUM_TXNS_FILE_2);
     }
 
     // Bad record with invalid timestamp should fail the file parsing and rollback the transaction.
@@ -156,5 +172,35 @@ public class RecordFileParserTest extends IntegrationTest {
         recordFileParser.parse();
         assertThat(Files.walk(parserProperties.getParsedPath())).filteredOn(p -> !p.toFile().isDirectory()).hasSize(0);
         assertThat(transactionRepository.count()).isEqualTo(0L);
+        assertEquals(0, recordFileRepository.count());
+    }
+
+    @Test
+    void loadRecordFileTwiceShouldSkip() throws Exception {
+        fileCopier.copy();
+        final String fileName = file1.toString();
+        boolean success = recordFileParser.loadRecordFile(fileName, "", "");
+        assertTrue(success);
+        Assertions.assertThat(transactionRepository.findAll()).hasSize(NUM_TXNS_FILE_1);
+        assertEquals(1, recordFileRepository.findByName(fileName).size());
+
+        success = recordFileParser.loadRecordFile(fileName, "", "");
+        assertTrue(success);
+        Assertions.assertThat(transactionRepository.findAll()).hasSize(NUM_TXNS_FILE_1);
+        assertEquals(1, recordFileRepository.findByName(fileName).size());
+    }
+
+    @Test
+    void checkHashes() throws Exception {
+        String expectedPrevFileHash =
+                "591558e059bd1629ee386c4e35a6875b4c67a096718f5d225772a651042715189414df7db5588495efb2a85dc4a0ffda";
+        fileCopier.copy();
+        final String fileName = file2.toString();
+        recordFileParser.loadRecordFile(fileName, expectedPrevFileHash, "456");
+        List<RecordFile> recordFileList = recordFileRepository.findByName(fileName);
+        assertEquals(1, recordFileList.size());
+        RecordFile recordFile = recordFileList.get(0);
+        assertEquals(expectedPrevFileHash, recordFile.getPreviousHash());
+        assertEquals("456", recordFile.getFileHash());
     }
 }

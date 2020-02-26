@@ -43,7 +43,7 @@ public class DatabaseUtilities {
         DatabaseUtilities.dataSource = dataSource;
     }
 
-    public static final Connection getConnection() {
+    public static Connection getConnection() {
         while (true) {
             if (ShutdownHelper.isStopping()) {
                 throw new IllegalStateException("Shutting down");

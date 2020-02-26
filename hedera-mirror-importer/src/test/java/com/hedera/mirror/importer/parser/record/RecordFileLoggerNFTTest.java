@@ -111,7 +111,6 @@ public class RecordFileLoggerNFTTest extends AbstractRecordFileLoggerTest {
     @Test
     void contractCallItemizedTransfers() throws Exception {
         givenSuccessfulContractCallTransaction();
-        processRecords();
         assertEverything();
     }
 
@@ -119,14 +118,12 @@ public class RecordFileLoggerNFTTest extends AbstractRecordFileLoggerTest {
     void contractCallAggregatedTransfers() throws Exception {
         parserProperties.setPersistNonFeeTransfers(true);
         givenSuccessfulContractCallTransactionAggregatedTransfers();
-        processRecords();
         assertEverything();
     }
 
     @Test
     void contractCreateItemizedTransfers() throws Exception {
         givenSuccessfulContractCreateTransaction();
-        processRecords();
         assertEverything();
     }
 
@@ -134,14 +131,12 @@ public class RecordFileLoggerNFTTest extends AbstractRecordFileLoggerTest {
     void contractCreateAggregatedTransfers() throws Exception {
         parserProperties.setPersistNonFeeTransfers(true);
         givenSuccessfulContractCreateTransactionAggregatedTransfers();
-        processRecords();
         assertEverything();
     }
 
     @Test
     void cryptoCreateItemizedTransfers() throws Exception {
         givenSuccessfulCryptoCreateTransaction();
-        processRecords();
         assertEverything();
     }
 
@@ -149,7 +144,6 @@ public class RecordFileLoggerNFTTest extends AbstractRecordFileLoggerTest {
     void cryptoCreateItemizedTransfersStoreNonFeeTransfers() throws Exception {
         parserProperties.setPersistNonFeeTransfers(true);
         givenSuccessfulCryptoCreateTransaction();
-        processRecords();
         assertEverything();
     }
 
@@ -157,14 +151,12 @@ public class RecordFileLoggerNFTTest extends AbstractRecordFileLoggerTest {
     void cryptoCreateAggregatedTransfers() throws Exception {
         parserProperties.setPersistNonFeeTransfers(true);
         givenSuccessfulCryptoCreateTransactionAggregatedTransfers();
-        processRecords();
         assertEverything();
     }
 
     @Test
     void cryptoTransferItemizedTransfers() throws Exception {
         givenSuccessfulCryptoTransferTransaction();
-        processRecords();
         assertEverything();
     }
 
@@ -172,21 +164,18 @@ public class RecordFileLoggerNFTTest extends AbstractRecordFileLoggerTest {
     void cryptoTransferAggregatedTransfers() throws Exception {
         parserProperties.setPersistNonFeeTransfers(true);
         givenSuccessfulCryptoTransferTransactionAggregatedTransfers();
-        processRecords();
         assertEverything();
     }
 
     @Test
     void cryptoTransferFailedItemizedTransfers() throws Exception {
         givenFailedCryptoTransferTransaction();
-        processRecords();
         assertEverything();
     }
 
     @Test
     void cryptoTransferFailedAggregatedTransfers() throws Exception {
         givenFailedCryptoTransferTransactionAggregatedTransfers();
-        processRecords();
         assertEverything();
     }
 
@@ -194,7 +183,6 @@ public class RecordFileLoggerNFTTest extends AbstractRecordFileLoggerTest {
     void cryptoTransferFailedItemizedTransfersConfigAlways() throws Exception {
         parserProperties.setPersistNonFeeTransfers(true);
         givenFailedCryptoTransferTransaction();
-        processRecords();
         assertEverything();
     }
 
@@ -262,7 +250,7 @@ public class RecordFileLoggerNFTTest extends AbstractRecordFileLoggerTest {
         var record = transactionRecordSuccess(transactionBody, transferList).build();
 
         expectedTransactions.add(new TransactionContext(transaction, record));
-        RecordFileLogger.storeRecord(transaction, record);
+        storeTransactionAndRecord(transaction, record);
     }
 
     private Transaction contractCreate() {
@@ -281,7 +269,7 @@ public class RecordFileLoggerNFTTest extends AbstractRecordFileLoggerTest {
         var record = transactionRecordSuccess(transactionBody, transferList).build();
 
         expectedTransactions.add(new TransactionContext(transaction, record));
-        RecordFileLogger.storeRecord(transaction, record);
+        storeTransactionAndRecord(transaction, record);
     }
 
     private Transaction cryptoCreate() {
@@ -303,7 +291,7 @@ public class RecordFileLoggerNFTTest extends AbstractRecordFileLoggerTest {
         var record = transactionRecordSuccess(transactionBody, transferList).build();
 
         expectedTransactions.add(new TransactionContext(transaction, record));
-        RecordFileLogger.storeRecord(transaction, record);
+        storeTransactionAndRecord(transaction, record);
     }
 
     private Transaction cryptoTransfer() {
@@ -325,7 +313,7 @@ public class RecordFileLoggerNFTTest extends AbstractRecordFileLoggerTest {
         var record = transactionRecord(transactionBody, rc, transferList).build();
 
         expectedTransactions.add(new TransactionContext(transaction, record));
-        RecordFileLogger.storeRecord(transaction, record);
+        storeTransactionAndRecord(transaction, record);
     }
 
     private void cryptoTransferWithTransferList(TransferList.Builder transferList) throws Exception {
@@ -412,10 +400,6 @@ public class RecordFileLoggerNFTTest extends AbstractRecordFileLoggerTest {
         if (parserProperties.isPersistNonFeeTransfers()) {
             expectedNonFeeTransfersCount += 2;
         }
-    }
-
-    private void processRecords() throws SQLException {
-        RecordFileLogger.completeFile("", "");
     }
 
     private TransactionBody.Builder transactionBody() {

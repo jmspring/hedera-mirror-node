@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.google.protobuf.ByteString;
 
-import com.hedera.mirror.importer.repository.NonFeeTransferRepository;
+import com.hedera.mirror.importer.parser.domain.RecordItem;
 
 import com.hederahashgraph.api.proto.java.AccountAmount;
 import com.hederahashgraph.api.proto.java.AccountID;
@@ -40,9 +40,7 @@ import com.hederahashgraph.api.proto.java.TransactionBody.Builder;
 import com.hederahashgraph.api.proto.java.TransactionRecord;
 import com.hederahashgraph.api.proto.java.TransferList;
 import java.util.Optional;
-import java.util.UUID;
 import javax.annotation.Resource;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.test.context.jdbc.Sql;
@@ -57,6 +55,7 @@ import com.hedera.mirror.importer.repository.EntityRepository;
 import com.hedera.mirror.importer.repository.EntityTypeRepository;
 import com.hedera.mirror.importer.repository.FileDataRepository;
 import com.hedera.mirror.importer.repository.LiveHashRepository;
+import com.hedera.mirror.importer.repository.NonFeeTransferRepository;
 import com.hedera.mirror.importer.repository.RecordFileRepository;
 import com.hedera.mirror.importer.repository.TopicMessageRepository;
 import com.hedera.mirror.importer.repository.TransactionRepository;
@@ -90,22 +89,30 @@ public class AbstractRecordFileLoggerTest extends IntegrationTest {
     protected TopicMessageRepository topicMessageRepository;
     @Resource
     protected NonFeeTransferRepository nonFeeTransferRepository;
+    @Resource
+    PostgresWriterProperties postgresWriterProperties;
+    @Resource
+    RecordParserPostgresConnection postgresConnection;
+    @Resource
+    RecordParsedItemHandler recordParsedItemHandler;
 
     @Resource
     protected RecordParserProperties parserProperties;
 
-    @BeforeEach
-    final void beforeCommon() throws Exception {
-        assertTrue(RecordFileLogger.start());
-        assertEquals(RecordFileLogger.INIT_RESULT.OK, RecordFileLogger.initFile(UUID.randomUUID().toString()));
+    protected void storeTransactionAndRecord(
+            com.hederahashgraph.api.proto.java.Transaction transaction, TransactionRecord record) throws Exception {
+        storeTransactionAndRecord(transaction, record, null);
     }
 
-    @AfterEach
-    final void afterCommon() {
-        RecordFileLogger.finish();
+    protected void storeTransactionAndRecord(
+            com.hederahashgraph.api.proto.java.Transaction transaction, TransactionRecord record,
+            byte[] transactionBytes) throws Exception {
+        RecordFileLogger.storeRecord(new RecordItem(transaction, record, transactionBytes, null));
+        recordParsedItemHandler.onFileComplete();
+        postgresConnection.getConnection().commit();
     }
 
-    protected final void assertAccount(AccountID accountId, com.hedera.mirror.importer.domain.Entities dbEntity) {
+    protected void assertAccount(AccountID accountId, com.hedera.mirror.importer.domain.Entities dbEntity) {
         assertThat(accountId)
                 .isNotEqualTo(AccountID.getDefaultInstance())
                 .extracting(AccountID::getShardNum, AccountID::getRealmNum, AccountID::getAccountNum)
@@ -114,7 +121,7 @@ public class AbstractRecordFileLoggerTest extends IntegrationTest {
                 .isEqualTo(entityTypeRepository.findByName("account").get().getId());
     }
 
-    protected final void assertFile(FileID fileId, com.hedera.mirror.importer.domain.Entities dbEntity) {
+    protected void assertFile(FileID fileId, com.hedera.mirror.importer.domain.Entities dbEntity) {
         assertThat(fileId)
                 .isNotEqualTo(FileID.getDefaultInstance())
                 .extracting(FileID::getShardNum, FileID::getRealmNum, FileID::getFileNum)
@@ -189,7 +196,7 @@ public class AbstractRecordFileLoggerTest extends IntegrationTest {
         );
     }
 
-    protected final SignatureMap getSigMap() {
+    protected static SignatureMap getSigMap() {
         String key1 = "11111111111111111111c61eab86e2a9c164565b4e7a9a4146106e0a6cd03a8c395a110e91";
         String signature1 = "Signature 1 here";
         String key2 = "22222222222222222222c61eab86e2a9c164565b4e7a9a4146106e0a6cd03a8c395a110e91";
@@ -211,7 +218,7 @@ public class AbstractRecordFileLoggerTest extends IntegrationTest {
         return sigMap.build();
     }
 
-    protected final Key keyFromString(String key) {
+    protected static Key keyFromString(String key) {
         return Key.newBuilder().setEd25519(ByteString.copyFromUtf8(key)).build();
     }
 

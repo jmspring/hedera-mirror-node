@@ -24,11 +24,15 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Entity
 @Table(name = "t_file_data")
+@NoArgsConstructor
+@AllArgsConstructor
 public class FileData {
 
     @Id

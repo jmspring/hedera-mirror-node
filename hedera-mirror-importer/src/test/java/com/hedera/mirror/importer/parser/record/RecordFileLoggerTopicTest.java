@@ -76,8 +76,7 @@ public class RecordFileLoggerTopicTest extends AbstractRecordFileLoggerTest {
         var expectedEntity = createTopicEntity(topicId, null, null, adminKey, submitKey, memo, autoRenewAccount,
                 autoRenewPeriod);
 
-        RecordFileLogger.storeRecord(transaction, transactionRecord);
-        RecordFileLogger.completeFile("", "");
+        storeTransactionAndRecord(transaction, transactionRecord);
 
         long entityCount = autoRenewAccount != null ? 4 : 3; // Node, payer, topic & optionally autorenew
         var entity = entityRepository
@@ -99,8 +98,7 @@ public class RecordFileLoggerTopicTest extends AbstractRecordFileLoggerTest {
         var transactionRecord = createTransactionRecord(TopicID.newBuilder().setTopicNum(topicId)
                 .build(), null, null, consensusTimestamp, responseCode);
 
-        RecordFileLogger.storeRecord(transaction, transactionRecord);
-        RecordFileLogger.completeFile("", "");
+        storeTransactionAndRecord(transaction, transactionRecord);
 
         var entity = entityRepository.findByPrimaryKey(0L, 0L, topicId).get();
         assertTransactionInRepository(responseCode, consensusTimestamp, entity.getId());
@@ -124,8 +122,7 @@ public class RecordFileLoggerTopicTest extends AbstractRecordFileLoggerTest {
         var transactionRecord = createTransactionRecord(TopicID.newBuilder().setTopicNum(topicId)
                 .build(), null, null, consensusTimestamp, responseCode);
 
-        RecordFileLogger.storeRecord(transaction, transactionRecord);
-        RecordFileLogger.completeFile("", "");
+        storeTransactionAndRecord(transaction, transactionRecord);
 
         var entity = entityRepository.findByPrimaryKey(0L, 0L, topicId).get();
         assertTransactionInRepository(responseCode, consensusTimestamp, entity.getId());
@@ -148,8 +145,7 @@ public class RecordFileLoggerTopicTest extends AbstractRecordFileLoggerTest {
         var transactionRecord = createTransactionRecord(TopicID.newBuilder().setTopicNum(topicId)
                 .build(), null, null, consensusTimestamp, responseCode);
 
-        RecordFileLogger.storeRecord(transaction, transactionRecord);
-        RecordFileLogger.completeFile("", "");
+        storeTransactionAndRecord(transaction, transactionRecord);
 
         assertEquals(0L, entityRepository.count());
         assertEquals(0L, transactionRepository.count());
@@ -162,8 +158,7 @@ public class RecordFileLoggerTopicTest extends AbstractRecordFileLoggerTest {
         var transaction = createCreateTopicTransaction(null, null, "memo", null, null);
         var transactionRecord = createTransactionRecord(null, null, null, consensusTimestamp, responseCode);
 
-        RecordFileLogger.storeRecord(transaction, transactionRecord);
-        RecordFileLogger.completeFile("", "");
+        storeTransactionAndRecord(transaction, transactionRecord);
 
         assertTransactionInRepository(responseCode, consensusTimestamp, null);
         assertEquals(2L, entityRepository.count()); // Node, payer, no topic
@@ -200,8 +195,7 @@ public class RecordFileLoggerTopicTest extends AbstractRecordFileLoggerTest {
         var expectedEntity = createTopicEntity(topicId, updatedExpirationTimeSeconds, updatedExpirationTimeNanos,
                 updatedAdminKey, updatedSubmitKey, updatedMemo, autoRenewAccount, autoRenewPeriod);
 
-        RecordFileLogger.storeRecord(transaction, transactionRecord);
-        RecordFileLogger.completeFile("", "");
+        storeTransactionAndRecord(transaction, transactionRecord);
 
         long entityCount = autoRenewAccount != null ? 4 : 3; // Node, payer, topic & optionally autorenew
         var entity = entityRepository
@@ -233,8 +227,7 @@ public class RecordFileLoggerTopicTest extends AbstractRecordFileLoggerTest {
         var transactionRecord = createTransactionRecord(topicId, null, null, consensusTimestamp,
                 responseCode);
 
-        RecordFileLogger.storeRecord(transaction, transactionRecord);
-        RecordFileLogger.completeFile("", "");
+        storeTransactionAndRecord(transaction, transactionRecord);
 
         var entity = entityRepository
                 .findByPrimaryKey(topicId.getShardNum(), topicId.getRealmNum(), topicId.getTopicNum()).get();
@@ -260,8 +253,7 @@ public class RecordFileLoggerTopicTest extends AbstractRecordFileLoggerTest {
         var transactionRecord = createTransactionRecord(topicId, null, null, consensusTimestamp,
                 responseCode);
 
-        RecordFileLogger.storeRecord(transaction, transactionRecord);
-        RecordFileLogger.completeFile("", "");
+        storeTransactionAndRecord(transaction, transactionRecord);
 
         var entity = entityRepository
                 .findByPrimaryKey(topicId.getShardNum(), topicId.getRealmNum(), topicId.getTopicNum()).get();
@@ -331,8 +323,7 @@ public class RecordFileLoggerTopicTest extends AbstractRecordFileLoggerTest {
         var transactionRecord = createTransactionRecord(topicId, null, null, consensusTimestamp,
                 responseCode);
 
-        RecordFileLogger.storeRecord(transaction, transactionRecord);
-        RecordFileLogger.completeFile("", "");
+        storeTransactionAndRecord(transaction, transactionRecord);
 
         long entityCount = 3;
         if (autoRenewAccount != null) {
@@ -368,8 +359,7 @@ public class RecordFileLoggerTopicTest extends AbstractRecordFileLoggerTest {
         var transactionRecord = createTransactionRecord(topicId, null, null, consensusTimestamp,
                 responseCode);
 
-        RecordFileLogger.storeRecord(transaction, transactionRecord);
-        RecordFileLogger.completeFile("", "");
+        storeTransactionAndRecord(transaction, transactionRecord);
 
         var entity = entityRepository
                 .findByPrimaryKey(topicId.getShardNum(), topicId.getRealmNum(), topicId.getTopicNum()).get();
@@ -394,8 +384,7 @@ public class RecordFileLoggerTopicTest extends AbstractRecordFileLoggerTest {
         var transactionRecord = createTransactionRecord(topicId, null, null, consensusTimestamp,
                 responseCode);
 
-        RecordFileLogger.storeRecord(transaction, transactionRecord);
-        RecordFileLogger.completeFile("", "");
+        storeTransactionAndRecord(transaction, transactionRecord);
 
         var entity = entityRepository
                 .findByPrimaryKey(topicId.getShardNum(), topicId.getRealmNum(), topicId.getTopicNum()).get();
@@ -419,8 +408,7 @@ public class RecordFileLoggerTopicTest extends AbstractRecordFileLoggerTest {
         var transactionRecord = createTransactionRecord(topicId, null, null, consensusTimestamp,
                 responseCode);
 
-        RecordFileLogger.storeRecord(transaction, transactionRecord);
-        RecordFileLogger.completeFile("", "");
+        storeTransactionAndRecord(transaction, transactionRecord);
 
         var entity = entityRepository
                 .findByPrimaryKey(topicId.getShardNum(), topicId.getRealmNum(), topicId.getTopicNum()).get();
@@ -449,8 +437,7 @@ public class RecordFileLoggerTopicTest extends AbstractRecordFileLoggerTest {
         var transactionRecord = createTransactionRecord(topicId, sequenceNumber, runningHash
                 .getBytes(), consensusTimestamp, responseCode);
 
-        RecordFileLogger.storeRecord(transaction, transactionRecord);
-        RecordFileLogger.completeFile("", "");
+        storeTransactionAndRecord(transaction, transactionRecord);
 
         var entity = entityRepository
                 .findByPrimaryKey(topicId.getShardNum(), topicId.getRealmNum(), topicId.getTopicNum()).get();
@@ -479,8 +466,7 @@ public class RecordFileLoggerTopicTest extends AbstractRecordFileLoggerTest {
         var transactionRecord = createTransactionRecord(topicId, sequenceNumber, runningHash
                 .getBytes(), consensusTimestamp, responseCode);
 
-        RecordFileLogger.storeRecord(transaction, transactionRecord);
-        RecordFileLogger.completeFile("", "");
+        storeTransactionAndRecord(transaction, transactionRecord);
 
         var entity = entityRepository
                 .findByPrimaryKey(topicId.getShardNum(), topicId.getRealmNum(), topicId.getTopicNum()).get();
@@ -507,8 +493,7 @@ public class RecordFileLoggerTopicTest extends AbstractRecordFileLoggerTest {
         var transactionRecord = createTransactionRecord(topicId, sequenceNumber, runningHash
                 .getBytes(), consensusTimestamp, responseCode);
 
-        RecordFileLogger.storeRecord(transaction, transactionRecord);
-        RecordFileLogger.completeFile("", "");
+        storeTransactionAndRecord(transaction, transactionRecord);
 
         assertEquals(1L, entityRepository.count());
         assertEquals(0L, topicMessageRepository.count());
@@ -530,8 +515,7 @@ public class RecordFileLoggerTopicTest extends AbstractRecordFileLoggerTest {
         var transactionRecord = createTransactionRecord(topicId, sequenceNumber, runningHash
                 .getBytes(), consensusTimestamp, responseCode);
 
-        RecordFileLogger.storeRecord(transaction, transactionRecord);
-        RecordFileLogger.completeFile("", "");
+        storeTransactionAndRecord(transaction, transactionRecord);
 
         var entity = entityRepository
                 .findByPrimaryKey(topicId.getShardNum(), topicId.getRealmNum(), topicId.getTopicNum()).get();
@@ -567,9 +551,9 @@ public class RecordFileLoggerTopicTest extends AbstractRecordFileLoggerTest {
                 .build();
     }
 
-    private TransactionRecord createTransactionRecord(TopicID topicId, Long topicSequenceNumber,
-                                                      byte[] topicRunningHash, long consensusTimestamp,
-                                                      ResponseCodeEnum responseCode) {
+    private static TransactionRecord createTransactionRecord(TopicID topicId, Long topicSequenceNumber,
+                                                             byte[] topicRunningHash, long consensusTimestamp,
+                                                             ResponseCodeEnum responseCode) {
         var receipt = TransactionReceipt.newBuilder().setStatus(responseCode);
         if (null != topicId) {
             receipt.setTopicID(topicId);
@@ -602,9 +586,9 @@ public class RecordFileLoggerTopicTest extends AbstractRecordFileLoggerTest {
         return entityRepository.save(entities);
     }
 
-    private Entities createTopicEntity(TopicID topicId, Long expirationTimeSeconds, Integer expirationTimeNanos,
-                                       Key adminKey, Key submitKey, String memo, Long autoRenewAccount,
-                                       Long autoRenewPeriod) {
+    private static Entities createTopicEntity(TopicID topicId, Long expirationTimeSeconds, Integer expirationTimeNanos,
+                                              Key adminKey, Key submitKey, String memo, Long autoRenewAccount,
+                                              Long autoRenewPeriod) {
         var topic = new Entities();
         topic.setEntityShard(topicId.getShardNum());
         topic.setEntityRealm(topicId.getRealmNum());
@@ -634,8 +618,9 @@ public class RecordFileLoggerTopicTest extends AbstractRecordFileLoggerTest {
         return topic;
     }
 
-    private TopicMessage createTopicMessage(TopicID topicId, String message, long sequenceNumber, String runningHash,
-                                            long consensusTimestamp) {
+    private static TopicMessage createTopicMessage(TopicID topicId, String message, long sequenceNumber,
+                                                   String runningHash,
+                                                   long consensusTimestamp) {
         var topicMessage = new TopicMessage();
         topicMessage.setConsensusTimestamp(consensusTimestamp);
         topicMessage.setRealmNum((int) topicId.getRealmNum());
