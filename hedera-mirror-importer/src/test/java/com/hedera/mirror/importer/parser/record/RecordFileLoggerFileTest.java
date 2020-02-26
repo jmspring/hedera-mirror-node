@@ -101,7 +101,7 @@ public class RecordFileLoggerFileTest extends AbstractRecordFileLoggerTest {
         TransactionRecord record = transactionRecord(transactionBody);
 
         RecordFileLogger.storeRecord(transaction, record);
-        RecordFileLogger.completeFile("", "");
+        RecordFileLogger.completeFile(streamFileInfo);
 
         com.hedera.mirror.importer.domain.Transaction dbTransaction = transactionRepository
                 .findById(Utility.timeStampInNanos(record.getConsensusTimestamp())).get();
@@ -157,7 +157,7 @@ public class RecordFileLoggerFileTest extends AbstractRecordFileLoggerTest {
         TransactionRecord record = transactionRecord(transactionBody);
 
         RecordFileLogger.storeRecord(transaction, record);
-        RecordFileLogger.completeFile("", "");
+        RecordFileLogger.completeFile(streamFileInfo);
 
         com.hedera.mirror.importer.domain.Transaction dbTransaction = transactionRepository
                 .findById(Utility.timeStampInNanos(record.getConsensusTimestamp())).get();
@@ -198,7 +198,7 @@ public class RecordFileLoggerFileTest extends AbstractRecordFileLoggerTest {
                 .setRealmNum(0).setFileNum(10).build());
 
         RecordFileLogger.storeRecord(transaction, record);
-        RecordFileLogger.completeFile("", "");
+        RecordFileLogger.completeFile(streamFileInfo);
 
         com.hedera.mirror.importer.domain.Transaction dbTransaction = transactionRepository
                 .findById(Utility.timeStampInNanos(record.getConsensusTimestamp())).get();
@@ -255,7 +255,7 @@ public class RecordFileLoggerFileTest extends AbstractRecordFileLoggerTest {
                 .setRealmNum(0).setFileNum(2000).build());
 
         RecordFileLogger.storeRecord(transaction, record);
-        RecordFileLogger.completeFile("", "");
+        RecordFileLogger.completeFile(streamFileInfo);
 
         com.hedera.mirror.importer.domain.Transaction dbTransaction = transactionRepository
                 .findById(Utility.timeStampInNanos(record.getConsensusTimestamp())).get();
@@ -310,7 +310,7 @@ public class RecordFileLoggerFileTest extends AbstractRecordFileLoggerTest {
         TransactionRecord record = transactionRecord(transactionBody);
 
         RecordFileLogger.storeRecord(transaction, record);
-        RecordFileLogger.completeFile("", "");
+        RecordFileLogger.completeFile(streamFileInfo);
 
         var dbTransaction = transactionRepository.findById(Utility.timeStampInNanos(record.getConsensusTimestamp()))
                 .get();
@@ -336,7 +336,7 @@ public class RecordFileLoggerFileTest extends AbstractRecordFileLoggerTest {
 
         RecordFileLogger.storeRecord(transaction, record);
 
-        RecordFileLogger.completeFile("", "");
+        RecordFileLogger.completeFile(streamFileInfo);
 
         com.hedera.mirror.importer.domain.Transaction dbTransaction = transactionRepository
                 .findById(Utility.timeStampInNanos(record.getConsensusTimestamp())).get();
@@ -388,7 +388,7 @@ public class RecordFileLoggerFileTest extends AbstractRecordFileLoggerTest {
 
         RecordFileLogger.storeRecord(transaction, record);
 
-        RecordFileLogger.completeFile("", "");
+        RecordFileLogger.completeFile(streamFileInfo);
 
         com.hedera.mirror.importer.domain.Transaction dbTransaction = transactionRepository
                 .findById(Utility.timeStampInNanos(record.getConsensusTimestamp())).get();
@@ -445,7 +445,7 @@ public class RecordFileLoggerFileTest extends AbstractRecordFileLoggerTest {
 
         RecordFileLogger.storeRecord(transaction, record);
 
-        RecordFileLogger.completeFile("", "");
+        RecordFileLogger.completeFile(streamFileInfo);
 
         com.hedera.mirror.importer.domain.Transaction dbTransaction = transactionRepository
                 .findById(Utility.timeStampInNanos(record.getConsensusTimestamp())).get();
@@ -505,7 +505,7 @@ public class RecordFileLoggerFileTest extends AbstractRecordFileLoggerTest {
 
         RecordFileLogger.storeRecord(transaction, record);
 
-        RecordFileLogger.completeFile("", "");
+        RecordFileLogger.completeFile(streamFileInfo);
 
         com.hedera.mirror.importer.domain.Transaction dbTransaction = transactionRepository
                 .findById(Utility.timeStampInNanos(record.getConsensusTimestamp())).get();
@@ -571,7 +571,7 @@ public class RecordFileLoggerFileTest extends AbstractRecordFileLoggerTest {
 
         RecordFileLogger.storeRecord(transaction, record);
 
-        RecordFileLogger.completeFile("", "");
+        RecordFileLogger.completeFile(streamFileInfo);
 
         com.hedera.mirror.importer.domain.Transaction dbTransaction = transactionRepository
                 .findById(Utility.timeStampInNanos(record.getConsensusTimestamp())).get();
@@ -630,7 +630,7 @@ public class RecordFileLoggerFileTest extends AbstractRecordFileLoggerTest {
 
         RecordFileLogger.storeRecord(transaction, record);
 
-        RecordFileLogger.completeFile("", "");
+        RecordFileLogger.completeFile(streamFileInfo);
 
         com.hedera.mirror.importer.domain.Transaction dbTransaction = transactionRepository
                 .findById(Utility.timeStampInNanos(record.getConsensusTimestamp())).get();
@@ -686,7 +686,7 @@ public class RecordFileLoggerFileTest extends AbstractRecordFileLoggerTest {
 
         RecordFileLogger.storeRecord(transaction, record);
 
-        RecordFileLogger.completeFile("", "");
+        RecordFileLogger.completeFile(streamFileInfo);
 
         com.hedera.mirror.importer.domain.Transaction dbTransaction = transactionRepository
                 .findById(Utility.timeStampInNanos(record.getConsensusTimestamp())).get();
@@ -751,7 +751,7 @@ public class RecordFileLoggerFileTest extends AbstractRecordFileLoggerTest {
 
         RecordFileLogger.storeRecord(transaction, record);
 
-        RecordFileLogger.completeFile("", "");
+        RecordFileLogger.completeFile(streamFileInfo);
 
         com.hedera.mirror.importer.domain.Transaction dbTransaction = transactionRepository
                 .findById(Utility.timeStampInNanos(record.getConsensusTimestamp())).get();
@@ -806,7 +806,7 @@ public class RecordFileLoggerFileTest extends AbstractRecordFileLoggerTest {
 
         RecordFileLogger.storeRecord(transaction, record);
 
-        RecordFileLogger.completeFile("", "");
+        RecordFileLogger.completeFile(streamFileInfo);
 
         com.hedera.mirror.importer.domain.Transaction dbTransaction = transactionRepository
                 .findById(Utility.timeStampInNanos(record.getConsensusTimestamp())).get();
@@ -869,7 +869,7 @@ public class RecordFileLoggerFileTest extends AbstractRecordFileLoggerTest {
 
         RecordFileLogger.storeRecord(transaction, record);
 
-        RecordFileLogger.completeFile("", "");
+        RecordFileLogger.completeFile(streamFileInfo);
 
         com.hedera.mirror.importer.domain.Transaction dbTransaction = transactionRepository
                 .findById(Utility.timeStampInNanos(record.getConsensusTimestamp())).get();
@@ -922,7 +922,7 @@ public class RecordFileLoggerFileTest extends AbstractRecordFileLoggerTest {
 
         RecordFileLogger.storeRecord(transaction, record);
 
-        RecordFileLogger.completeFile("", "");
+        RecordFileLogger.completeFile(streamFileInfo);
 
         com.hedera.mirror.importer.domain.Transaction dbTransaction = transactionRepository
                 .findById(Utility.timeStampInNanos(record.getConsensusTimestamp())).get();
@@ -983,7 +983,7 @@ public class RecordFileLoggerFileTest extends AbstractRecordFileLoggerTest {
 
         RecordFileLogger.storeRecord(transaction, record);
 
-        RecordFileLogger.completeFile("", "");
+        RecordFileLogger.completeFile(streamFileInfo);
 
         com.hedera.mirror.importer.domain.Transaction dbTransaction = transactionRepository
                 .findById(Utility.timeStampInNanos(record.getConsensusTimestamp())).get();
@@ -1034,7 +1034,7 @@ public class RecordFileLoggerFileTest extends AbstractRecordFileLoggerTest {
 
         RecordFileLogger.storeRecord(transaction, record);
 
-        RecordFileLogger.completeFile("", "");
+        RecordFileLogger.completeFile(streamFileInfo);
 
         com.hedera.mirror.importer.domain.Transaction dbTransaction = transactionRepository
                 .findById(Utility.timeStampInNanos(record.getConsensusTimestamp())).get();
@@ -1090,7 +1090,7 @@ public class RecordFileLoggerFileTest extends AbstractRecordFileLoggerTest {
 
         RecordFileLogger.storeRecord(transaction, record);
 
-        RecordFileLogger.completeFile("", "");
+        RecordFileLogger.completeFile(streamFileInfo);
 
         com.hedera.mirror.importer.domain.Transaction dbTransaction = transactionRepository
                 .findById(Utility.timeStampInNanos(record.getConsensusTimestamp())).get();
@@ -1152,7 +1152,7 @@ public class RecordFileLoggerFileTest extends AbstractRecordFileLoggerTest {
 
         RecordFileLogger.storeRecord(transaction, record);
 
-        RecordFileLogger.completeFile("", "");
+        RecordFileLogger.completeFile(streamFileInfo);
 
         com.hedera.mirror.importer.domain.Transaction dbTransaction = transactionRepository
                 .findById(Utility.timeStampInNanos(record.getConsensusTimestamp())).get();
@@ -1220,7 +1220,7 @@ public class RecordFileLoggerFileTest extends AbstractRecordFileLoggerTest {
 
         RecordFileLogger.storeRecord(transaction, record);
 
-        RecordFileLogger.completeFile("", "");
+        RecordFileLogger.completeFile(streamFileInfo);
 
         com.hedera.mirror.importer.domain.Transaction dbTransaction = transactionRepository
                 .findById(Utility.timeStampInNanos(record.getConsensusTimestamp())).get();
@@ -1269,7 +1269,7 @@ public class RecordFileLoggerFileTest extends AbstractRecordFileLoggerTest {
 
         RecordFileLogger.storeRecord(fileDeleteTransaction, record);
 
-        RecordFileLogger.completeFile("", "");
+        RecordFileLogger.completeFile(streamFileInfo);
 
         com.hedera.mirror.importer.domain.Transaction dbTransaction = transactionRepository
                 .findById(Utility.timeStampInNanos(record.getConsensusTimestamp())).get();
@@ -1319,7 +1319,7 @@ public class RecordFileLoggerFileTest extends AbstractRecordFileLoggerTest {
 
         RecordFileLogger.storeRecord(fileDeleteTransaction, record);
 
-        RecordFileLogger.completeFile("", "");
+        RecordFileLogger.completeFile(streamFileInfo);
 
         com.hedera.mirror.importer.domain.Transaction dbTransaction = transactionRepository
                 .findById(Utility.timeStampInNanos(record.getConsensusTimestamp())).get();
@@ -1368,7 +1368,7 @@ public class RecordFileLoggerFileTest extends AbstractRecordFileLoggerTest {
 
         RecordFileLogger.storeRecord(systemDeleteTransaction, record);
 
-        RecordFileLogger.completeFile("", "");
+        RecordFileLogger.completeFile(streamFileInfo);
 
         com.hedera.mirror.importer.domain.Transaction dbTransaction = transactionRepository
                 .findById(Utility.timeStampInNanos(record.getConsensusTimestamp())).get();
@@ -1417,7 +1417,7 @@ public class RecordFileLoggerFileTest extends AbstractRecordFileLoggerTest {
 
         RecordFileLogger.storeRecord(systemUndeleteTransaction, record);
 
-        RecordFileLogger.completeFile("", "");
+        RecordFileLogger.completeFile(streamFileInfo);
 
         com.hedera.mirror.importer.domain.Transaction dbTransaction = transactionRepository
                 .findById(Utility.timeStampInNanos(record.getConsensusTimestamp())).get();
@@ -1466,7 +1466,7 @@ public class RecordFileLoggerFileTest extends AbstractRecordFileLoggerTest {
 
         RecordFileLogger.storeRecord(systemDeleteTransaction, record);
 
-        RecordFileLogger.completeFile("", "");
+        RecordFileLogger.completeFile(streamFileInfo);
 
         com.hedera.mirror.importer.domain.Transaction dbTransaction = transactionRepository
                 .findById(Utility.timeStampInNanos(record.getConsensusTimestamp())).get();
@@ -1502,7 +1502,7 @@ public class RecordFileLoggerFileTest extends AbstractRecordFileLoggerTest {
 
         RecordFileLogger.storeRecord(systemUndeleteTransaction, record);
 
-        RecordFileLogger.completeFile("", "");
+        RecordFileLogger.completeFile(streamFileInfo);
 
         com.hedera.mirror.importer.domain.Transaction dbTransaction = transactionRepository
                 .findById(Utility.timeStampInNanos(record.getConsensusTimestamp())).get();

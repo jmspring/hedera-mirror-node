@@ -20,7 +20,10 @@ package com.hedera.mirror.importer.domain;
  * ‍
  */
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -28,6 +31,8 @@ import javax.persistence.Table;
 @Data
 @Entity
 @Table(name = "non_fee_transfers")
+@NoArgsConstructor
+@AllArgsConstructor
 public class NonFeeTransfer {
     // There is not actually a pk on non_fee_transfers.
     @Id

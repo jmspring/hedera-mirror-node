@@ -415,7 +415,7 @@ public class RecordFileLoggerNFTTest extends AbstractRecordFileLoggerTest {
     }
 
     private void processRecords() throws SQLException {
-        RecordFileLogger.completeFile("", "");
+        RecordFileLogger.completeFile(streamFileInfo);
     }
 
     private TransactionBody.Builder transactionBody() {

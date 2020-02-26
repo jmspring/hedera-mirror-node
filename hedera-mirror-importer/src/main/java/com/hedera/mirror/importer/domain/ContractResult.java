@@ -25,11 +25,15 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Entity
 @Table(name = "t_contract_result")
+@NoArgsConstructor
+@AllArgsConstructor
 public class ContractResult {
 
     @Id

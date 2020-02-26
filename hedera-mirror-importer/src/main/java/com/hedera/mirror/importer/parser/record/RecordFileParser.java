@@ -44,6 +44,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 
 import com.hedera.mirror.importer.domain.ApplicationStatusCode;
 import com.hedera.mirror.importer.parser.FileParser;
+import com.hedera.mirror.importer.parser.domain.StreamFileInfo;
 import com.hedera.mirror.importer.repository.ApplicationStatusRepository;
 import com.hedera.mirror.importer.util.FileDelimiter;
 import com.hedera.mirror.importer.util.ShutdownHelper;
@@ -130,6 +131,7 @@ public class RecordFileParser implements FileParser {
      * @throws Exception
      */
     private boolean loadRecordFile(String fileName, String previousFileHash, String thisFileHash) throws Exception {
+        StreamFileInfo streamFileInfo = new StreamFileInfo(fileName, thisFileHash, previousFileHash);
 
         File file = new File(fileName);
         String newFileHash = "";
@@ -140,7 +142,7 @@ public class RecordFileParser implements FileParser {
         }
         long counter = 0;
         byte[] readFileHash = new byte[48];
-        RecordFileLogger.INIT_RESULT initFileResult = RecordFileLogger.initFile(fileName);
+        RecordFileLogger.INIT_RESULT initFileResult = RecordFileLogger.initFile(streamFileInfo);
         Stopwatch stopwatch = Stopwatch.createStarted();
         Integer recordFileVersion = 0;
         Boolean success = false;
@@ -241,7 +243,7 @@ public class RecordFileParser implements FileParser {
                 }
 
                 log.trace("Calculated file hash for the current file {}", thisFileHash);
-                RecordFileLogger.completeFile(thisFileHash, previousFileHash);
+                RecordFileLogger.completeFile(streamFileInfo);
 
                 if (!Utility.hashIsEmpty(thisFileHash)) {
                     applicationStatusRepository
@@ -311,30 +313,25 @@ public class RecordFileParser implements FileParser {
 
             Path path = parserProperties.getValidPath();
             log.debug("Parsing record files from {}", path);
-            if (RecordFileLogger.start()) {
+            File file = path.toFile();
+            if (file.isDirectory()) { //if it's a directory
+                String[] files = file.list(); // get all files under the directory
+                Arrays.sort(files);           // sorted by name (timestamp)
 
-                File file = path.toFile();
-                if (file.isDirectory()) { //if it's a directory
+                // add directory prefix to get full path
+                List<String> fullPaths = Arrays.asList(files).stream()
+                        .filter(f -> Utility.isRecordFile(f))
+                        .map(s -> file + "/" + s)
+                        .collect(Collectors.toList());
 
-                    String[] files = file.list(); // get all files under the directory
-                    Arrays.sort(files);           // sorted by name (timestamp)
-
-                    // add directory prefix to get full path
-                    List<String> fullPaths = Arrays.asList(files).stream()
-                            .filter(f -> Utility.isRecordFile(f))
-                            .map(s -> file + "/" + s)
-                            .collect(Collectors.toList());
-
-                    if (fullPaths != null && fullPaths.size() != 0) {
-                        log.trace("Processing record files: {}", fullPaths);
-                        loadRecordFiles(fullPaths);
-                    } else {
-                        log.debug("No files to parse");
-                    }
+                if (fullPaths != null && fullPaths.size() != 0) {
+                    log.trace("Processing record files: {}", fullPaths);
+                    loadRecordFiles(fullPaths);
                 } else {
-                    log.error("Input parameter is not a folder: {}", path);
+                    log.debug("No files to parse");
                 }
-                RecordFileLogger.finish();
+            } else {
+                log.error("Input parameter is not a folder: {}", path);
             }
         } catch (Exception e) {
             log.error("Error parsing files", e);

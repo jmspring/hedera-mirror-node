@@ -24,9 +24,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.google.protobuf.ByteString;
-
-import com.hedera.mirror.importer.repository.NonFeeTransferRepository;
-
 import com.hederahashgraph.api.proto.java.AccountAmount;
 import com.hederahashgraph.api.proto.java.AccountID;
 import com.hederahashgraph.api.proto.java.ContractID;
@@ -40,9 +37,7 @@ import com.hederahashgraph.api.proto.java.TransactionBody.Builder;
 import com.hederahashgraph.api.proto.java.TransactionRecord;
 import com.hederahashgraph.api.proto.java.TransferList;
 import java.util.Optional;
-import java.util.UUID;
 import javax.annotation.Resource;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.test.context.jdbc.Sql;
@@ -51,12 +46,14 @@ import com.hedera.mirror.importer.IntegrationTest;
 import com.hedera.mirror.importer.domain.Entities;
 import com.hedera.mirror.importer.domain.Transaction;
 import com.hedera.mirror.importer.domain.TransactionResult;
+import com.hedera.mirror.importer.parser.domain.StreamFileInfo;
 import com.hedera.mirror.importer.repository.ContractResultRepository;
 import com.hedera.mirror.importer.repository.CryptoTransferRepository;
 import com.hedera.mirror.importer.repository.EntityRepository;
 import com.hedera.mirror.importer.repository.EntityTypeRepository;
 import com.hedera.mirror.importer.repository.FileDataRepository;
 import com.hedera.mirror.importer.repository.LiveHashRepository;
+import com.hedera.mirror.importer.repository.NonFeeTransferRepository;
 import com.hedera.mirror.importer.repository.RecordFileRepository;
 import com.hedera.mirror.importer.repository.TopicMessageRepository;
 import com.hedera.mirror.importer.repository.TransactionRepository;
@@ -90,19 +87,21 @@ public class AbstractRecordFileLoggerTest extends IntegrationTest {
     protected TopicMessageRepository topicMessageRepository;
     @Resource
     protected NonFeeTransferRepository nonFeeTransferRepository;
+    @Resource
+    PostgresRecordWriterProperties postgresRecordWriterProperties;
 
     @Resource
     protected RecordParserProperties parserProperties;
 
+    protected final String FILENAME = "TestFile";
+    protected final String FILE_HASH = "fileHash";
+    protected final String PREV_FILE_HASH = "prevFileHash";
+    protected StreamFileInfo streamFileInfo;
+
     @BeforeEach
     final void beforeCommon() throws Exception {
-        assertTrue(RecordFileLogger.start());
-        assertEquals(RecordFileLogger.INIT_RESULT.OK, RecordFileLogger.initFile(UUID.randomUUID().toString()));
-    }
-
-    @AfterEach
-    final void afterCommon() {
-        RecordFileLogger.finish();
+        streamFileInfo = new StreamFileInfo(FILENAME, FILE_HASH, PREV_FILE_HASH);
+        assertEquals(RecordFileLogger.INIT_RESULT.OK, RecordFileLogger.initFile(streamFileInfo));
     }
 
     protected final void assertAccount(AccountID accountId, com.hedera.mirror.importer.domain.Entities dbEntity) {
@@ -189,7 +188,7 @@ public class AbstractRecordFileLoggerTest extends IntegrationTest {
         );
     }
 
-    protected final SignatureMap getSigMap() {
+    protected static SignatureMap getSigMap() {
         String key1 = "11111111111111111111c61eab86e2a9c164565b4e7a9a4146106e0a6cd03a8c395a110e91";
         String signature1 = "Signature 1 here";
         String key2 = "22222222222222222222c61eab86e2a9c164565b4e7a9a4146106e0a6cd03a8c395a110e91";
@@ -211,7 +210,7 @@ public class AbstractRecordFileLoggerTest extends IntegrationTest {
         return sigMap.build();
     }
 
-    protected final Key keyFromString(String key) {
+    protected static Key keyFromString(String key) {
         return Key.newBuilder().setEd25519(ByteString.copyFromUtf8(key)).build();
     }
 

@@ -1,29 +1,31 @@
 package com.hedera.mirror.importer.parser;
 
 import com.hedera.mirror.importer.exception.ImporterException;
+import com.hedera.mirror.importer.parser.domain.StreamFileInfo;
 
 /**
- * Invocation pattern: onBatchStart ...<events from sub-interfaces>... [onBatchComplete | onError]
+ * Invocation pattern: onBatchStart [ ...<events from sub-interfaces>... [onBatchComplete | onError] ]
  */
 public interface StreamEventsHandler {
     /**
      * Called when starting processing of a batch of transactions.
      *
-     * @param batchName depends on batch type; if streams are files, then filename.
+     * @param fileInfo
+     * @return true if batch processing should continue, false to skip the batch.
      * @throws ImporterException
      */
-    void onBatchStart(String batchName) throws ImporterException;
+    boolean onBatchStart(StreamFileInfo fileInfo) throws ImporterException;
 
     /**
      * Called after successful handling of batch of transactions.
      *
-     * @param batchName depends on batch type; if streams are files, then filename.
+     * @param fileInfo
      * @throws ImporterException
      */
-    void onBatchComplete(String batchName) throws ImporterException;
+    void onBatchComplete(StreamFileInfo fileInfo) throws ImporterException;
 
     /**
-     * Called if an exception is thrown during processing of batch.
+     * Called if an error is encountered during processing of batch.
      */
-    void onError(Throwable e);
+    void onError();
 }

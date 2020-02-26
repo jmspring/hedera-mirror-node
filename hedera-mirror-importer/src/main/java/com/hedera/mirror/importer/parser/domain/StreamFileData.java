@@ -2,7 +2,7 @@ package com.hedera.mirror.importer.parser.domain;
 
 import java.io.InputStream;
 
-public class StreamFile {
+public class StreamFileData {
     String filename;
     InputStream inputStream;
 }
