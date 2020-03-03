@@ -23,9 +23,10 @@ package com.hedera.mirror.importer.parser.record;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import javax.annotation.PreDestroy;
 import javax.inject.Named;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.NotImplementedException;
 
 import com.hedera.mirror.importer.domain.ContractResult;
 import com.hedera.mirror.importer.domain.CryptoTransfer;
@@ -37,11 +38,8 @@ import com.hedera.mirror.importer.domain.Transaction;
 import com.hedera.mirror.importer.exception.ImporterException;
 import com.hedera.mirror.importer.exception.ParserSQLException;
 
-import org.apache.commons.lang3.NotImplementedException;
-
 @Log4j2
 @Named
-@RequiredArgsConstructor
 public class PostgresWritingRecordParsedItemHandler implements RecordParsedItemHandler {
     private long batch_count = 0;
     private PreparedStatement sqlInsertTransaction;
@@ -52,6 +50,17 @@ public class PostgresWritingRecordParsedItemHandler implements RecordParsedItemH
     private PreparedStatement sqlInsertLiveHashes;
     private PreparedStatement sqlInsertTopicMessage;
     private final PostgresWriterProperties properties;
+
+    PostgresWritingRecordParsedItemHandler(
+            PostgresWriterProperties properties, RecordParserPostgresConnection postgresConnection) {
+        this.properties = properties;
+        initSqlStatements(postgresConnection.getConnection());
+    }
+
+    @PreDestroy
+    public void preDestroy() {
+        closeStatements();
+    }
 
     void initSqlStatements(Connection connection) throws ParserSQLException {
         try {

@@ -36,10 +36,7 @@ import com.hederahashgraph.api.proto.java.TransactionBody;
 import com.hederahashgraph.api.proto.java.TransactionBody.Builder;
 import com.hederahashgraph.api.proto.java.TransactionRecord;
 import com.hederahashgraph.api.proto.java.TransferList;
-import java.util.UUID;
 import javax.annotation.Resource;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.springframework.test.context.jdbc.Sql;
 
 import com.hedera.mirror.importer.IntegrationTest;
@@ -89,17 +86,6 @@ public class AbstractRecordFileLoggerTest extends IntegrationTest {
 
     @Resource
     protected RecordParserProperties parserProperties;
-
-    @BeforeEach
-    final void beforeCommon() throws Exception {
-        assertTrue(RecordFileLogger.start());
-        assertEquals(RecordFileLogger.INIT_RESULT.OK, RecordFileLogger.initFile(UUID.randomUUID().toString()));
-    }
-
-    @AfterEach
-    final void afterCommon() {
-        RecordFileLogger.finish();
-    }
 
     protected final void assertAccount(AccountID accountId, com.hedera.mirror.importer.domain.Entities dbEntity) {
         assertThat(accountId)
