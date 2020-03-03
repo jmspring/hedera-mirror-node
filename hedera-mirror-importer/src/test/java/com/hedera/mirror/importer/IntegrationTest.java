@@ -21,11 +21,9 @@ package com.hedera.mirror.importer;
  */
 
 import javax.annotation.PreDestroy;
-
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.util.TestPropertyValues;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
@@ -54,20 +52,20 @@ public abstract class IntegrationTest {
 
         @Override
         public void initialize(ConfigurableApplicationContext applicationContext) {
-            try {
-                log.info("Starting PostgreSQL");
-                postgresql = new PostgreSQLContainer<>("postgres:9.6-alpine");
-                postgresql.start();
-
-                TestPropertyValues
-                        .of("hedera.mirror.db.name=" + postgresql.getDatabaseName())
-                        .and("hedera.mirror.db.password=" + postgresql.getPassword())
-                        .and("hedera.mirror.db.username=" + postgresql.getUsername())
-                        .and("spring.datasource.url=" + postgresql.getJdbcUrl())
-                        .applyTo(applicationContext);
-            } catch (Throwable ex) {
-                log.warn(ex.getMessage());
-            }
+//            try {
+//                log.info("Starting PostgreSQL");
+//                postgresql = new PostgreSQLContainer<>("postgres:9.6-alpine");
+//                postgresql.start();
+//
+//                TestPropertyValues
+//                        .of("hedera.mirror.db.name=" + postgresql.getDatabaseName())
+//                        .and("hedera.mirror.db.password=" + postgresql.getPassword())
+//                        .and("hedera.mirror.db.username=" + postgresql.getUsername())
+//                        .and("spring.datasource.url=" + postgresql.getJdbcUrl())
+//                        .applyTo(applicationContext);
+//            } catch (Throwable ex) {
+//                log.warn(ex.getMessage());
+//            }
         }
 
         @PreDestroy

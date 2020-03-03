@@ -155,7 +155,6 @@ public class RecordFileParser implements FileParser {
         if (result == RecordItemParser.INIT_RESULT.SKIP) {
             return true; // skip this fle
         } else if (result == RecordItemParser.INIT_RESULT.FAIL) {
-            rollback();
             return false;
         }
         long counter = 0;
@@ -325,30 +324,26 @@ public class RecordFileParser implements FileParser {
 
             Path path = parserProperties.getValidPath();
             log.debug("Parsing record files from {}", path);
-            if (recordItemParser.start()) {
+            File file = path.toFile();
+            if (file.isDirectory()) { //if it's a directory
 
-                File file = path.toFile();
-                if (file.isDirectory()) { //if it's a directory
+                String[] files = file.list(); // get all files under the directory
+                Arrays.sort(files);           // sorted by name (timestamp)
 
-                    String[] files = file.list(); // get all files under the directory
-                    Arrays.sort(files);           // sorted by name (timestamp)
+                // add directory prefix to get full path
+                List<String> fullPaths = Arrays.asList(files).stream()
+                        .filter(f -> Utility.isRecordFile(f))
+                        .map(s -> file + "/" + s)
+                        .collect(Collectors.toList());
 
-                    // add directory prefix to get full path
-                    List<String> fullPaths = Arrays.asList(files).stream()
-                            .filter(f -> Utility.isRecordFile(f))
-                            .map(s -> file + "/" + s)
-                            .collect(Collectors.toList());
-
-                    if (fullPaths != null && fullPaths.size() != 0) {
-                        log.trace("Processing record files: {}", fullPaths);
-                        loadRecordFiles(fullPaths);
-                    } else {
-                        log.debug("No files to parse");
-                    }
+                if (fullPaths != null && fullPaths.size() != 0) {
+                    log.trace("Processing record files: {}", fullPaths);
+                    loadRecordFiles(fullPaths);
                 } else {
-                    log.error("Input parameter is not a folder: {}", path);
+                    log.debug("No files to parse");
                 }
-                recordItemParser.finish();
+            } else {
+                log.error("Input parameter is not a folder: {}", path);
             }
         } catch (Exception e) {
             log.error("Error parsing files", e);

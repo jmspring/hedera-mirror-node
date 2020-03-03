@@ -50,7 +50,6 @@ import java.sql.Types;
 import java.util.Set;
 import java.util.function.Predicate;
 import javax.inject.Named;
-import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 
 import com.hedera.mirror.importer.addressbook.NetworkAddressBook;
@@ -85,7 +84,6 @@ public class RecordItemParser implements RecordItemListener {
     private final PostgresWritingRecordParsedItemHandler postgresWriter;
 
     public Connection connect = null;
-    @Getter
     private long fileId = 0;
 
     public RecordItemParser(CommonParserProperties commonParserProperties, RecordParserProperties parserProperties,
@@ -102,41 +100,27 @@ public class RecordItemParser implements RecordItemListener {
         transactionFilter = commonParserProperties.getFilter();
     }
 
-    public boolean start() {
-        connect = DatabaseUtilities.openDatabase(connect);
-
-        if (connect == null) {
-            log.error("Unable to connect to database");
-            return false;
-        }
-        // do not auto-commit
+    void initConnection() {
         try {
-            connect.setAutoCommit(false);
+            connect = DatabaseUtilities.getConnection();
+            connect.setAutoCommit(false); // do not auto-commit
         } catch (SQLException e) {
-            log.error("Unable to set connection to not auto commit", e);
-            return false;
+            throw new ParserSQLException("Error setting up connection to database", e);
         }
-        try {
-            postgresWriter.initSqlStatements(connect);
-        } catch (ParserSQLException e) {
-            log.error("Unable to prepare SQL statements", e);
-            return false;
-        }
-        return true;
+        postgresWriter.initSqlStatements(connect);
     }
 
-    public boolean finish() {
+    void closeConnection() {
         try {
-            postgresWriter.finish();
-            connect = DatabaseUtilities.closeDatabase(connect);
-            return false;
+            postgresWriter.closeStatements();
+            DatabaseUtilities.closeDatabase(connect);
         } catch (SQLException e) {
             log.error("Error closing connection", e);
         }
-        return true;
     }
 
     public INIT_RESULT initFile(String fileName) {
+        initConnection();
         try {
             fileId = 0;
 
@@ -149,6 +133,7 @@ public class RecordItemParser implements RecordItemListener {
 
             if (fileId == 0) {
                 log.trace("File {} already exists in the database.", fileName);
+                closeConnection();
                 return INIT_RESULT.SKIP;
             } else {
                 log.trace("Added file {} to the database.", fileName);
@@ -157,6 +142,7 @@ public class RecordItemParser implements RecordItemListener {
         } catch (SQLException e) {
             log.error("Error saving file in database: {}", fileName, e);
         }
+        rollback();
         return INIT_RESULT.FAIL;
     }
 
@@ -184,11 +170,13 @@ public class RecordItemParser implements RecordItemListener {
             // commit the changes to the database
             connect.commit();
         }
+        closeConnection();
     }
 
     public void rollback() {
         try {
             connect.rollback();
+            closeConnection();
         } catch (SQLException e) {
             log.error("Exception while rolling transaction back", e);
         }

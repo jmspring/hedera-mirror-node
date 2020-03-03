@@ -98,7 +98,7 @@ public class PostgresWritingRecordParserItemHandlerTest extends IntegrationTest 
 
     @AfterEach
     final void afterEach() throws Exception {
-        postgresWriter.finish();
+        postgresWriter.closeStatements();
         connection.close();
     }
 

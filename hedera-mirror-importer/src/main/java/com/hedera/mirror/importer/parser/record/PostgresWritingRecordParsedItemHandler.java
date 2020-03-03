@@ -90,16 +90,12 @@ public class PostgresWritingRecordParsedItemHandler implements RecordParsedItemH
         }
     }
 
-    public void finish() {
-        closeStatements();
-    }
-
     @Override
     public void onFileComplete() {
         executeBatches();
     }
 
-    private void closeStatements() {
+    public void closeStatements() {
         try {
             sqlInsertTransaction.close();
             sqlInsertTransferList.close();

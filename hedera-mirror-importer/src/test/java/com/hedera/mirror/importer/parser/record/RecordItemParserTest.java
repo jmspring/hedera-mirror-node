@@ -22,6 +22,7 @@ package com.hedera.mirror.importer.parser.record;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
@@ -31,38 +32,57 @@ public class RecordItemParserTest extends AbstractRecordItemParserTest {
 
     @Test
     void initFile() throws Exception {
-        assertEquals(RecordItemParser.INIT_RESULT.OK, recordItemParser.initFile("TestFile"));
-        recordItemParser.completeFile("", "");
-        RecordFile recordFile = recordFileRepository.findById(recordItemParser.getFileId()).get();
-        assertEquals("TestFile", recordFile.getName());
+        // when
+        recordItemParser.completeFile("", ""); // corresponding initFile is in beforeEach()
+
+        // expect
+        assertEquals(1, recordFileRepository.findByName(FILE_NAME).size());
     }
 
     @Test
     void initFileDuplicate() throws Exception {
-        assertEquals(RecordItemParser.INIT_RESULT.OK, recordItemParser.initFile("TestFile"));
-        assertEquals(RecordItemParser.INIT_RESULT.SKIP, recordItemParser.initFile("TestFile"));
+        // given: file already processed
+        recordItemParser.completeFile("", ""); // corresponding initFile is in beforeEach()
+
+        // when
+        var result = recordItemParser.initFile(FILE_NAME);
+
+        // then
+        assertEquals(RecordItemParser.INIT_RESULT.SKIP, result);
+    }
+
+    private void checkFileAndHashes(String fileName, String fileHash, String prevFileHash) {
+        List<RecordFile> recordFileList = recordFileRepository.findByName(fileName);
+        assertEquals(1, recordFileList.size());
+        RecordFile recordFile = recordFileList.get(0);
+        assertEquals(fileHash, recordFile.getFileHash());
+        assertEquals(prevFileHash, recordFile.getPreviousHash());
     }
 
     @Test
     void completeFileNoHashes() throws Exception {
-        recordItemParser.completeFile("", "");
-        RecordFile recordFile = recordFileRepository.findById(recordItemParser.getFileId()).get();
-        assertNull(recordFile.getFileHash());
-        assertNull(recordFile.getPreviousHash());
+        // when
+        recordItemParser.completeFile("", ""); // corresponding initFile is in beforeEach()
+
+        // then
+        checkFileAndHashes(FILE_NAME, null, null);
     }
 
     @Test
     void completeFileWithHashes() throws Exception {
-        recordItemParser.completeFile("123", "456");
-        RecordFile recordFile = recordFileRepository.findById(recordItemParser.getFileId()).get();
-        assertEquals("123", recordFile.getFileHash());
-        assertEquals("456", recordFile.getPreviousHash());
+        // when
+        recordItemParser.completeFile("123", "456"); // corresponding initFile is in beforeEach()
+
+        // then
+        checkFileAndHashes(FILE_NAME, "123", "456");
     }
 
     @Test
-    void rollback() throws Exception {
+    void rollback() {
+        // when
         recordItemParser.rollback();
-        Optional<RecordFile> recordFile = recordFileRepository.findById(recordItemParser.getFileId());
-        assertFalse(recordFile.isPresent());
+
+        // then
+        assertTrue(recordFileRepository.findByName(FILE_NAME).isEmpty());
     }
 }
