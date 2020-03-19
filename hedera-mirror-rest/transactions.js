@@ -7,9 +7,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -209,7 +209,7 @@ const getTransactions = function(req) {
 
   let query = reqToSql(req);
 
-  logger.debug('getTransactions query: ' + query.query + JSON.stringify(query.params));
+  logger.trace('getTransactions query: ' + query.query + JSON.stringify(query.params));
 
   // Execute query
   return pool.query(query.query, query.params).then(results => {
@@ -297,7 +297,7 @@ const getOneTransaction = function(req, res) {
 
   const pgSqlQuery = utils.convertMySqlStyleQueryToPostgress(sqlQuery, sqlParams);
 
-  logger.debug('getOneTransaction query: ' + pgSqlQuery + JSON.stringify(sqlParams));
+  logger.trace('getOneTransaction query: ' + pgSqlQuery + JSON.stringify(sqlParams));
 
   // Execute query
   pool.query(pgSqlQuery, sqlParams, (error, results) => {

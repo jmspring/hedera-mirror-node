@@ -7,9 +7,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -144,7 +144,7 @@ const getAccounts = function(req) {
 
   const pgEntityQuery = utils.convertMySqlStyleQueryToPostgress(entitySql, entityParams);
 
-  logger.debug('getAccounts query: ' + pgEntityQuery + JSON.stringify(entityParams));
+  logger.trace('getAccounts query: ' + pgEntityQuery + JSON.stringify(entityParams));
 
   // Execute query
   return pool.query(pgEntityQuery, entityParams).then(results => {
@@ -223,7 +223,7 @@ const getOneAccount = function(req, res) {
   const entityParams = [acc.realm, acc.num, config.shard, acc.realm, acc.num];
   const pgEntityQuery = utils.convertMySqlStyleQueryToPostgress(entitySql, entityParams);
 
-  logger.debug('getOneAccount entity query: ' + pgEntityQuery + JSON.stringify(entityParams));
+  logger.trace('getOneAccount entity query: ' + pgEntityQuery + JSON.stringify(entityParams));
   // Execute query & get a promise
   const entityPromise = pool.query(pgEntityQuery, entityParams);
 
@@ -252,7 +252,7 @@ const getOneAccount = function(req, res) {
 
   const pgTransactionsQuery = utils.convertMySqlStyleQueryToPostgress(transactionsQuery, innerParams);
 
-  logger.debug('getOneAccount transactions query: ' + pgTransactionsQuery + JSON.stringify(innerParams));
+  logger.trace('getOneAccount transactions query: ' + pgTransactionsQuery + JSON.stringify(innerParams));
 
   // Execute query & get a promise
   const transactionsPromise = pool.query(pgTransactionsQuery, innerParams);
