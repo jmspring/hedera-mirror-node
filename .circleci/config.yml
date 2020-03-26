@@ -1,4 +1,4 @@
-version: 2
+version: 2.1
 
 references:
   workspace_root: &workspace_root /tmp/workspace
@@ -35,8 +35,43 @@ references:
           POSTGRES_PASSWORD: mirror_node_pass
           POSTGRES_USER: mirror_node
 
+commands:
+  run_rest_acceptance_tests:
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - npm-v1-{{ .Branch }}-{{ checksum "hedera-mirror-rest/package-lock.json" }}
+            - npm-v1-{{ .Branch }}
+            - npm-v1-
+      - run:
+          working_directory: "hedera-mirror-rest"
+          name: npm install
+          command: npm install
+      - run:
+          working_directory: "hedera-mirror-rest"
+          name: Acceptance tests
+          command: npm run acceptancetest
+
 workflows:
   version: 2
+
+  testnet_primary_acceptance_tests:
+    jobs:
+      - testnet_primary_acceptance_test
+
+  testnet_failover_acceptance_tests:
+    jobs:
+      - testnet_failover_acceptance_test
+
+  mainnet_primary_acceptance_tests:
+    jobs:
+      - mainnet_primary_acceptance_test
+
+  mainnet_failover_acceptance_tests:
+    jobs:
+      - mainnet_failover_acceptance_test
+
   main:
     jobs:
       - build_maven:
@@ -77,6 +112,38 @@ workflows:
               only: /.*/
 
 jobs:
+  testnet_primary_acceptance_test:
+    docker:
+      - image: node:12.10.0
+    environment:
+      TARGET: 35.224.14.83:5551
+    steps:
+      - run_rest_acceptance_tests
+
+  testnet_failover_acceptance_test:
+    docker:
+      - image: node:12.10.0
+    environment:
+      TARGET: 34.90.104.4:5551
+    steps:
+      - run_rest_acceptance_tests
+
+  mainnet_primary_acceptance_test:
+    docker:
+      - image: node:12.10.0
+    environment:
+      TARGET: 34.66.66.150:5551
+    steps:
+      - run_rest_acceptance_tests
+
+  mainnet_failover_acceptance_test:
+    docker:
+      - image: node:12.10.0
+    environment:
+      TARGET: 34.90.167.33:5551
+    steps:
+      - run_rest_acceptance_tests
+
   build_maven:
     environment:
       MAVEN_CLI_OPTS: --batch-mode --no-transfer-progress --show-version -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
@@ -148,7 +215,7 @@ jobs:
           POSTGRES_USER: mirror_node
           POSTGRES_PASSWORD: mirror_node_pass
     steps:
-      - checkout:
+      - checkout
       - restore_cache:
           keys:
             - npm-v1-{{ .Branch }}-{{ checksum "hedera-mirror-rest/package-lock.json" }}
